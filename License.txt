@@ -1,6 +1,6 @@
 ﻿DEFINITIONS
 "You" and "Licensee" refers to the person, entity or organization which is downloading and/or using CSMM Patrons Mod
-from confluence.catalysm.net website, and any successor or assignee of same.
+from https://github.com/Prisma501/CSMM-Patrons-Mod website, and any successor or assignee of same.
 
 "This Agreement" refers to this license agreement, and terms and conditions specified herein.
 
@@ -18,7 +18,7 @@ considered subject to the terms of this Agreement. If you do not wish to agree t
 
 
 2. REDISTRIBUTION
-2.1 You may link from a website to the confluence.catalysm.net web page where you have downloaded CSMM Patrons Mod. You may not link directly to CSMM Patrons mod download file.
+2.1 You may link from a website to the https://github.com/Prisma501/CSMM-Patrons-Mod web page where you have downloaded CSMM Patrons Mod. You may not link directly to CSMM Patrons mod download file.
 
 2.2 You may not make CSMM Patrons Mod, modified or unmodified, available for download from any website.
 
