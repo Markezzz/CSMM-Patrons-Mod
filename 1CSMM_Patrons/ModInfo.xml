@@ -2,9 +2,9 @@
 <xml>
 	<ModInfo>
 		<Name value="CSMM Patrons" />
-		<Description value="Additional management and player control functionality and adv. claim creator." />
+		<Description value="Additional management and player control functionality" />
 		<Author value="Prisma501" />
-		<Version value="11.0" />
+		<Version value="12.0" />
 		<Website value="https://csmm.catalysm.net" />
 	</ModInfo>
 </xml>
