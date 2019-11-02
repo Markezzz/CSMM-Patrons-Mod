@@ -193,6 +193,9 @@ function InitMap() {
 	}
 	
 	if (HasPermission ("webapi.viewallclaims")) {
+		layerControl.addOverlay (GetHomesLayer (map, mapinfo), "Player beds");
+		layerCount++;
+
 		layerControl.addOverlay (GetNormalClaimsLayer (map, mapinfo), "Adv. Claims Normal");
 		layerCount++;
 	
@@ -1418,5 +1421,78 @@ function GetLcbFreeClaimsLayer (map, mapinfo) {
 	});
 
 	return lcbfreeClaimsGroup;
+}
+
+function GetHomesLayer (map, mapinfo) {
+	var homesGroup = L.layerGroup();
+	var homesClusterGroup = L.markerClusterGroup({
+		disableClusteringAtZoom: mapinfo.maxzoom,
+		singleMarkerMode: true,
+		maxClusterRadius: 50
+	});
+	var homesRectGroup = L.layerGroup();
+	homesGroup.addLayer(homesClusterGroup);
+	homesGroup.addLayer(homesRectGroup);
+	var maxZoomForCluster = -1;
+
+
+	var sethomes = function(data) {
+		homesClusterGroup.clearLayers();
+		homesRectGroup.clearLayers();
+	
+		var homePower = Math.floor(Math.log(data.homesize) / Math.LN2);
+		var maxClusterZoomUnlimited = mapinfo.maxzoom - (homePower - 3);
+		var maxClusterZoomLimitedMax = Math.min(maxClusterZoomUnlimited, mapinfo.maxzoom+1);
+		maxZoomForCluster = Math.max(maxClusterZoomLimitedMax, 0);
+	
+		checkHomeClustering({target: map});
+
+		var sizeHalf = Math.floor(data.homesize / 2);
+
+		$.each( data.homeowners, function( key, val ) {
+			var steamid = val.steamid;
+			
+			var color = "#55ff55";
+				
+			var pos = L.latLng(val.x, val.z);
+			var bounds = L.latLngBounds(L.latLng(val.x - sizeHalf, val.z - sizeHalf), L.latLng(val.x + sizeHalf, val.z + sizeHalf));
+			var r = L.rectangle(bounds, {color: color, weight: 1, opacity: 0.8, fillOpacity: 0.15});
+			var m = L.marker(pos, { clickable: false, keyboard: false, zIndexOffset:-1000, iconSize: [0,0], icon: L.divIcon({className: 'invisIcon', iconSize:[0,0]}) });
+			r.bindPopup("Owner: " + steamid + " <br/>Position: " + val.x + " " + val.y + " " + val.z);
+			homesRectGroup.addLayer(r);
+			homesClusterGroup.addLayer(m);
+			
+		});
+	}
+
+	var updateHomesEvent = function() {
+		var port = location.port;
+		port = +port + 1;
+		var hostname = location.hostname;
+		$.getJSON( "http://" + hostname + ":" + port + "/api/getplayerhomes")
+		.done(sethomes)
+		.fail(function(jqxhr, textStatus, error) {
+			console.log("Error fetching player homes");
+		})
+	}
+
+
+	var checkHomeClustering = function(e) {
+		if (e.target._zoom >= maxZoomForCluster) {
+			homesGroup.removeLayer(homesClusterGroup);	
+		} else {
+			homesGroup.addLayer(homesClusterGroup);	
+		}
+	};
+
+	map.on('zoomend', checkHomeClustering);
+	
+	map.on('overlayadd', function(e) {
+		if (e.layer == homesGroup) {
+			updateHomesEvent();
+		}
+	});
+
+	return homesGroup;
 }
 
