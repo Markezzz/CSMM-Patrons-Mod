@@ -195,7 +195,13 @@ function InitMap() {
 	if (HasPermission ("webapi.viewallclaims")) {
 		layerControl.addOverlay (GetHomesLayer (map, mapinfo), "Player beds");
 		layerCount++;
-
+		
+		layerControl.addOverlay (GetQuestPOILayer (map, mapinfo), "Quest POIs");
+		layerCount++;
+		
+		layerControl.addOverlay (GetQuestPOIBedLcbLayer (map, mapinfo), "Quest POIs with bed/lcb");
+		layerCount++;
+				
 		layerControl.addOverlay (GetNormalClaimsLayer (map, mapinfo), "Adv. Claims Normal");
 		layerCount++;
 	
@@ -1447,18 +1453,18 @@ function GetHomesLayer (map, mapinfo) {
 	
 		checkHomeClustering({target: map});
 
-		var sizeHalf = Math.floor(data.homesize / 2);
-
+		var size = data.homesize;
+		
 		$.each( data.homeowners, function( key, val ) {
 			var steamid = val.steamid;
 			
-			var color = "#55ff55";
+			var color = val.active ? "#55ff55" : "#ff0000";
 				
 			var pos = L.latLng(val.x, val.z);
-			var bounds = L.latLngBounds(L.latLng(val.x - sizeHalf, val.z - sizeHalf), L.latLng(val.x + sizeHalf, val.z + sizeHalf));
+			var bounds = L.latLngBounds(L.latLng(val.x - size, val.z - size), L.latLng(val.x + size, val.z + size));
 			var r = L.rectangle(bounds, {color: color, weight: 1, opacity: 0.8, fillOpacity: 0.15});
 			var m = L.marker(pos, { clickable: false, keyboard: false, zIndexOffset:-1000, iconSize: [0,0], icon: L.divIcon({className: 'invisIcon', iconSize:[0,0]}) });
-			r.bindPopup("Owner: " + steamid + " <br/>Position: " + val.x + " " + val.y + " " + val.z);
+			r.bindPopup("Owner: " + steamid + " <br/>Position: " + val.x + " " + val.y + " " + val.z + " <br/>Active: " + val.active);
 			homesRectGroup.addLayer(r);
 			homesClusterGroup.addLayer(m);
 			
@@ -1473,6 +1479,158 @@ function GetHomesLayer (map, mapinfo) {
 		.done(sethomes)
 		.fail(function(jqxhr, textStatus, error) {
 			console.log("Error fetching player homes");
+		})
+	}
+
+
+	var checkHomeClustering = function(e) {
+		if (e.target._zoom >= maxZoomForCluster) {
+			homesGroup.removeLayer(homesClusterGroup);	
+		} else {
+			homesGroup.addLayer(homesClusterGroup);	
+		}
+	};
+
+	map.on('zoomend', checkHomeClustering);
+	
+	map.on('overlayadd', function(e) {
+		if (e.layer == homesGroup) {
+			updateHomesEvent();
+		}
+	});
+
+	return homesGroup;
+}
+
+function GetQuestPOILayer (map, mapinfo) {
+	var homesGroup = L.layerGroup();
+	var homesClusterGroup = L.markerClusterGroup({
+		disableClusteringAtZoom: mapinfo.maxzoom,
+		singleMarkerMode: true,
+		maxClusterRadius: 50
+	});
+	var homesRectGroup = L.layerGroup();
+	homesGroup.addLayer(homesClusterGroup);
+	homesGroup.addLayer(homesRectGroup);
+	var maxZoomForCluster = -1;
+
+
+	var sethomes = function(data) {
+		homesClusterGroup.clearLayers();
+		homesRectGroup.clearLayers();
+	
+		var homePower = Math.floor(Math.log(50) / Math.LN2);
+		var maxClusterZoomUnlimited = mapinfo.maxzoom - (homePower - 3);
+		var maxClusterZoomLimitedMax = Math.min(maxClusterZoomUnlimited, mapinfo.maxzoom+1);
+		maxZoomForCluster = Math.max(maxClusterZoomLimitedMax, 0);
+	
+		checkHomeClustering({target: map});
+
+		
+
+		$.each( data.QuestPOIs, function( key, val ) {
+						
+			var color = "#ff0000";
+			var sizex = Math.abs(val.minx - val.maxx);
+			var sizez = Math.abs(val.minz - val.maxz);
+			var sizeHalfx = Math.floor(sizex / 2);
+			var sizeHalfz = Math.floor(sizez / 2);
+
+			var pos = L.latLng(val.x, val.z);
+			var bounds = L.latLngBounds(L.latLng(val.x - sizeHalfx, val.z - sizeHalfz), L.latLng(val.x + sizeHalfx, val.z + sizeHalfz));
+			var r = L.rectangle(bounds, {color: color, weight: 1, opacity: 0.8, fillOpacity: 0.15});
+			var m = L.marker(pos, { clickable: false, keyboard: false, zIndexOffset:-1000, iconSize: [0,0], icon: L.divIcon({className: 'invisIcon', iconSize:[0,0]}) });
+			r.bindPopup("Name: " + val.name + " <br/>Position: " + val.x + " " + val.z + " <br/>Conttains bed/lcb: " + val.containsbed);
+			homesRectGroup.addLayer(r);
+			homesClusterGroup.addLayer(m);
+			
+		});
+	}
+
+	var updateHomesEvent = function() {
+		var port = location.port;
+		port = +port + 1;
+		var hostname = location.hostname;
+		$.getJSON( "http://" + hostname + ":" + port + "/api/getquestpois")
+		.done(sethomes)
+		.fail(function(jqxhr, textStatus, error) {
+			console.log("Error fetching quest pois");
+		})
+	}
+
+
+	var checkHomeClustering = function(e) {
+		if (e.target._zoom >= maxZoomForCluster) {
+			homesGroup.removeLayer(homesClusterGroup);	
+		} else {
+			homesGroup.addLayer(homesClusterGroup);	
+		}
+	};
+
+	map.on('zoomend', checkHomeClustering);
+	
+	map.on('overlayadd', function(e) {
+		if (e.layer == homesGroup) {
+			updateHomesEvent();
+		}
+	});
+
+	return homesGroup;
+}
+
+function GetQuestPOIBedLcbLayer (map, mapinfo) {
+	var homesGroup = L.layerGroup();
+	var homesClusterGroup = L.markerClusterGroup({
+		disableClusteringAtZoom: mapinfo.maxzoom,
+		singleMarkerMode: true,
+		maxClusterRadius: 50
+	});
+	var homesRectGroup = L.layerGroup();
+	homesGroup.addLayer(homesClusterGroup);
+	homesGroup.addLayer(homesRectGroup);
+	var maxZoomForCluster = -1;
+
+
+	var sethomes = function(data) {
+		homesClusterGroup.clearLayers();
+		homesRectGroup.clearLayers();
+	
+		var homePower = Math.floor(Math.log(50) / Math.LN2);
+		var maxClusterZoomUnlimited = mapinfo.maxzoom - (homePower - 3);
+		var maxClusterZoomLimitedMax = Math.min(maxClusterZoomUnlimited, mapinfo.maxzoom+1);
+		maxZoomForCluster = Math.max(maxClusterZoomLimitedMax, 0);
+	
+		checkHomeClustering({target: map});
+
+		
+
+		$.each( data.QuestPOIs, function( key, val ) {
+						
+			var color = "#ff0000";
+			var sizex = Math.abs(val.minx - val.maxx);
+			var sizez = Math.abs(val.minz - val.maxz);
+			var sizeHalfx = Math.floor(sizex / 2);
+			var sizeHalfz = Math.floor(sizez / 2);
+
+			var pos = L.latLng(val.x, val.z);
+			var bounds = L.latLngBounds(L.latLng(val.x - sizeHalfx, val.z - sizeHalfz), L.latLng(val.x + sizeHalfx, val.z + sizeHalfz));
+			var r = L.rectangle(bounds, {color: color, weight: 1, opacity: 0.8, fillOpacity: 0.15});
+			var m = L.marker(pos, { clickable: false, keyboard: false, zIndexOffset:-1000, iconSize: [0,0], icon: L.divIcon({className: 'invisIcon', iconSize:[0,0]}) });
+			r.bindPopup("Name: " + val.name + " <br/>Position: " + val.x + " " + val.z + " <br/>Conttains bed/lcb: " + val.containsbed);
+			homesRectGroup.addLayer(r);
+			homesClusterGroup.addLayer(m);
+			
+		});
+	}
+
+	var updateHomesEvent = function() {
+		var port = location.port;
+		port = +port + 1;
+		var hostname = location.hostname;
+		$.getJSON( "http://" + hostname + ":" + port + "/api/getquestpois?filter=bedlcbonly")
+		.done(sethomes)
+		.fail(function(jqxhr, textStatus, error) {
+			console.log("Error fetching quest pois");
 		})
 	}
 
