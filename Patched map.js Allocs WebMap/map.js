@@ -689,7 +689,7 @@ function GetResetRegionsLayer (map, mapinfo) {
 	
   	var updateResetRegionsEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=resetregion")
@@ -750,7 +750,7 @@ function GetNormalClaimsLayer (map, mapinfo) {
 
 	var updateNormalEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=normal")
@@ -811,7 +811,7 @@ function GetReversedClaimsLayer (map, mapinfo) {
 
 	var updateReversedEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=reversed")
@@ -872,7 +872,7 @@ function GetHostilefreeClaimsLayer (map, mapinfo) {
 
 	var updateHostilefreeEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=hostilefree")
@@ -933,7 +933,7 @@ function GetTimedClaimsLayer (map, mapinfo) {
 
 	var updateTimedEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=timed")
@@ -994,7 +994,7 @@ function GetLeveledClaimsLayer (map, mapinfo) {
 
 	var updateLeveledEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=leveled")
@@ -1054,7 +1054,7 @@ function GetPortalClaimsLayer (map, mapinfo) {
 
 	var updatePortalEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=portal")
@@ -1114,7 +1114,7 @@ function GetOpenhoursClaimsLayer (map, mapinfo) {
 
 	var updateOpenhoursEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=openhours")
@@ -1175,7 +1175,7 @@ function GetNotifyClaimsLayer (map, mapinfo) {
 
 	var updateNotifyEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=notify")
@@ -1236,7 +1236,7 @@ function GetCommandClaimsLayer (map, mapinfo) {
 
 	var updateCommandEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=command")
@@ -1297,7 +1297,7 @@ function GetPlayerlevelClaimsLayer (map, mapinfo) {
 
 	var updatePlayerlevelEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=playerlevel")
@@ -1410,7 +1410,7 @@ function GetLcbFreeClaimsLayer (map, mapinfo) {
 
 	var updateLcbFreeEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 				
 		$.getJSON("http://" + hostname + ":" + port + "/api/getmapclaims?type=lcbfree")
@@ -1473,7 +1473,7 @@ function GetHomesLayer (map, mapinfo) {
 
 	var updateHomesEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 		$.getJSON( "http://" + hostname + ":" + port + "/api/getplayerhomes")
 		.done(sethomes)
@@ -1549,7 +1549,7 @@ function GetQuestPOILayer (map, mapinfo) {
 
 	var updateHomesEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 		$.getJSON( "http://" + hostname + ":" + port + "/api/getquestpois")
 		.done(sethomes)
@@ -1625,7 +1625,7 @@ function GetQuestPOIBedLcbLayer (map, mapinfo) {
 
 	var updateHomesEvent = function() {
 		var port = location.port;
-		port = port + 1;
+		port = +port + 1;
 		var hostname = location.hostname;
 		$.getJSON( "http://" + hostname + ":" + port + "/api/getquestpois?filter=bedlcbonly")
 		.done(sethomes)
